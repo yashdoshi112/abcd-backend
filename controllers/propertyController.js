@@ -4,17 +4,13 @@ const pool = require('../config/db');
 // GET /api/properties?price=...&location=...&type=...
 exports.getProperties = async (req, res) => {
   try {
-    const { price, location, type } = req.query;
+    const { price, type } = req.query;
     let query = 'SELECT * FROM properties WHERE 1=1';
     const params = [];
 
     if (price) {
       params.push(price);
       query += ` AND price <= $${params.length}`;
-    }
-    if (location) {
-      params.push(`%${location}%`);
-      query += ` AND address ILIKE $${params.length}`; // using address for location demo
     }
     if (type) {
       params.push(type);
@@ -23,6 +19,7 @@ exports.getProperties = async (req, res) => {
     
     const { rows } = await pool.query(query, params);
     res.json(rows);
+    console.log("rows", res.json(rows))
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch properties' });
